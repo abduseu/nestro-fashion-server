@@ -13,51 +13,59 @@ const uri = `mongodb+srv://${process.env.db_user}:${process.env.db_pass}@cluster
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
 });
 
 async function run() {
-  try {
-    await client.connect();
-    //Users code start from here:
-    const database = client.db('nestro')
-    const brands = database.collection('brands')
-    const products = database.collection('products')
-    
-    //Read Brands
-    app.get('/brands', async(req, res)=>{
-        const result = await brands.find().toArray()
-        res.send(result)
-    })
+    try {
+        await client.connect();
+        //Users code start from here:
+        const database = client.db('nestro')
+        const brands = database.collection('brands')
+        const products = database.collection('products')
 
-    //Read Products
-    app.get('/products', async(req, res)=>{
-        const result = await products.find().toArray()
-        res.send(result)
-    })
-    
+        //Read Brands
+        app.get('/brands', async (req, res) => {
+            const result = await brands.find().toArray()
+            res.send(result)
+        })
+
+        //Create Product
+        app.post('/products', async (req, res) => {
+            const product = req.body
+
+            const result = await products.insertOne(product)
+            res.send(result)
+        })
+
+        //Read Products
+        app.get('/products', async (req, res) => {
+            const result = await products.find().toArray()
+            res.send(result)
+        })
 
 
 
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-  } finally {
-    // Ensures that the client will close when you finish/error
-    // await client.close();
-  }
+
+        // Send a ping to confirm a successful connection
+        await client.db("admin").command({ ping: 1 });
+        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    } finally {
+        // Ensures that the client will close when you finish/error
+        // await client.close();
+    }
 }
 run().catch(console.dir);
 
 
-app.get('/', (req, res)=>{
+app.get('/', (req, res) => {
     res.send('Welcome to nestro-server')
 })
 
-app.listen(port, ()=>{
+app.listen(port, () => {
     console.log(`nestro-server is running on ${port}`)
 })
