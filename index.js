@@ -28,8 +28,15 @@ async function run() {
     const brands = database.collection('brands')
     const products = database.collection('products')
     
+    //Read Brands
     app.get('/brands', async(req, res)=>{
         const result = await brands.find().toArray()
+        res.send(result)
+    })
+
+    //Read Products
+    app.get('/products', async(req, res)=>{
+        const result = await products.find().toArray()
         res.send(result)
     })
     
