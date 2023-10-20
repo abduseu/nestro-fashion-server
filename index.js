@@ -49,19 +49,49 @@ async function run() {
         })
 
         //Read Products -> brands
-        app.get('/products/:id', async (req, res) => {
+        app.get('/brands/:id', async (req, res) => {
             const brand = req.params.id
 
-            const filter = { brand: brand}
-            const result = await products.find(filter).toArray() || {}
+            const filter = { brand: brand }
+            const result = await products.find(filter).toArray()
+            res.send(result)
+        })
+
+        //Read Product -> by _id
+        app.get('/products/:id', async(req, res)=>{
+            const id = req.params.id
+
+            const filter = { _id: new ObjectId(id) }
+            const result = await products.findOne(filter)
+            res.send(result)
+        })
+
+        //Update Product
+        app.put('/products/:id', async(req, res)=>{
+            const id = req.params.id
+            const product = req.body
+
+            const filter = { _id: new ObjectId(id) }
+            const updateProduct = {
+                $set: {
+                    name: product.name,
+                    brand: product.brand,
+                    type: product.type,
+                    price: product.price,
+                    description: product.description,
+                    rating: product.rating,
+                    image: product.image
+                }
+            }
+            const result = await products.updateOne(filter, updateProduct)
             res.send(result)
         })
 
         //Delete Products -> manage-products page
-        app.delete('/products/:id', async(req, res)=>{
+        app.delete('/products/:id', async (req, res) => {
             const id = req.params.id
 
-            const filter = { _id: new ObjectId(id)}
+            const filter = { _id: new ObjectId(id) }
             const result = await products.deleteOne(filter)
             res.send(result)
         })
