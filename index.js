@@ -53,7 +53,7 @@ async function run() {
             const brand = req.params.id
 
             const filter = { brand: brand}
-            const result = await products.findOne(filter) || {}
+            const result = await products.find(filter).toArray() || {}
             res.send(result)
         })
 
