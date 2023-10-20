@@ -8,7 +8,7 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.db_user}:${process.env.db_pass}@cluster0.rkpusfk.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -45,6 +45,24 @@ async function run() {
         //Read Products
         app.get('/products', async (req, res) => {
             const result = await products.find().toArray()
+            res.send(result)
+        })
+
+        //Read Products -> brands
+        app.get('/products/:id', async (req, res) => {
+            const brand = req.params.id
+
+            const filter = { brand: brand}
+            const result = await products.findOne(filter) || {}
+            res.send(result)
+        })
+
+        //Delete Products -> manage-products page
+        app.delete('/products/:id', async(req, res)=>{
+            const id = req.params.id
+
+            const filter = { _id: new ObjectId(id)}
+            const result = await products.deleteOne(filter)
             res.send(result)
         })
 
