@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
@@ -8,7 +9,7 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
 const uri = `mongodb+srv://${process.env.db_user}:${process.env.db_pass}@cluster0.rkpusfk.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -27,14 +28,16 @@ async function run() {
         const database = client.db('nestro')
         const brands = database.collection('brands')
         const products = database.collection('products')
+        const shopping_cart = database.collection('shopping_cart')
 
-        //Read Brands
+        //Brands -> Read
         app.get('/brands', async (req, res) => {
             const result = await brands.find().toArray()
             res.send(result)
         })
 
-        //Create Product
+        /* START CRUD OPERATIONS FOR PRODUCTS */
+        //Product -> Create
         app.post('/products', async (req, res) => {
             const product = req.body
 
@@ -42,13 +45,13 @@ async function run() {
             res.send(result)
         })
 
-        //Read Products
+        //Products -> Read
         app.get('/products', async (req, res) => {
             const result = await products.find().toArray()
             res.send(result)
         })
 
-        //Read Products -> brands
+        //Products/brands -> Read
         app.get('/brands/:id', async (req, res) => {
             const brand = req.params.id
 
@@ -57,7 +60,7 @@ async function run() {
             res.send(result)
         })
 
-        //Read Product -> by _id
+        //Product/_id -> Read
         app.get('/products/:id', async(req, res)=>{
             const id = req.params.id
 
@@ -66,7 +69,7 @@ async function run() {
             res.send(result)
         })
 
-        //Update Product
+        //Product/_id -> Update
         app.put('/products/:id', async(req, res)=>{
             const id = req.params.id
             const product = req.body
@@ -87,7 +90,7 @@ async function run() {
             res.send(result)
         })
 
-        //Delete Products -> manage-products page
+        //Products/_id -> Delete
         app.delete('/products/:id', async (req, res) => {
             const id = req.params.id
 
@@ -96,6 +99,32 @@ async function run() {
             res.send(result)
         })
 
+        /* START CRUD OPERATIONS FOR CART */
+        //Cart -> Create
+        app.post('/cart', async(req, res)=>{
+            const cart = req.body
+
+            const result = await shopping_cart.insertOne(cart)
+            res.send(result)
+        })
+
+        //Cart -> Read
+        app.get('/cart/:id', async(req, res)=>{
+            const email = req.params.id
+            
+            const filter = { userId: email }
+            const result = await shopping_cart.find(filter).toArray()
+            res.send(result)
+        })
+
+        //Cart/_id -> Delete
+        app.delete('/cart/:id', async (req, res) => {
+            const id = req.params.id
+
+            const filter = { _id: new ObjectId(id) }
+            const result = await shopping_cart.deleteOne(filter)
+            res.send(result)
+        })
 
 
 
