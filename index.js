@@ -23,7 +23,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
     try {
-        await client.connect();
+        //await client.connect();
         //Users code start from here:
         const database = client.db('nestro')
         const brands = database.collection('brands')
